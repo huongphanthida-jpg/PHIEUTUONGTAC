@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Học Tập Tương Tác - Nitrogen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5; --primary-light: #818cf8; --secondary: #0ea5e9;
+            --accent: #a855f7; --success: #22c55e; --danger: #ef4444;
+            --warning: #f59e0b; --bg-body: #f1f5f9; --bg-card: #ffffff;
+            --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
+            --font-main: 'Roboto', sans-serif;
+            
+            /* Section Colors */
+            --c-mc: #eff6ff; --b-mc: #bfdbfe;
+            --c-fill: #fdf4ff; --b-fill: #f5d0fe;
+            --c-tf: #f0fdf4; --b-tf: #bbf7d0;
+            --c-match: #fffbeb; --b-match: #fde68a;
+            --c-drag: #f8fafc; --b-drag: #cbd5e1;
+            --c-vid: #fff1f2; --b-vid: #fecdd3;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 0 15px; }
+
+        header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary), var(--accent));
+            color: white; padding: 40px 20px;
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center; margin-bottom: 30px; position: relative;
+        }
+
+        header h1 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: 10px; }
+        header h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+
+        .student-info { display: flex; gap: 15px; justify-content: center; max-width: 600px; margin: 0 auto; }
+        @media (max-width: 600px) { .student-info { flex-direction: column; } }
+        
+        .student-info input {
+            padding: 12px 20px; border: none; border-radius: 50px;
+            font-size: 1rem; font-family: var(--font-main);
+            outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card); border-radius: 20px; padding: 25px;
+            margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid var(--border); position: relative; transition: all 0.3s ease;
+        }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border);
+        }
+
+        .card-title { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .card-points { background: var(--primary-light); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
+
+        /* Phân màu cho từng dạng bài */
+        #sec-mc { border-top-color: var(--b-mc); } #sec-mc .card-title { color: #2563eb; }
+        #sec-fill { border-top-color: var(--b-fill); } #sec-fill .card-title { color: #c026d3; }
+        #sec-tf { border-top-color: var(--b-tf); } #sec-tf .card-title { color: #16a34a; }
+        #sec-match { border-top-color: var(--b-match); } #sec-match .card-title { color: #d97706; }
+        #sec-drag { border-top-color: var(--b-drag); } #sec-drag .card-title { color: #475569; }
+        #sec-vid { border-top-color: var(--b-vid); } #sec-vid .card-title { color: #e11d48; }
+
+        .question-item { margin-bottom: 20px; padding: 15px; border-radius: 10px; background: #f8fafc; position: relative; }
+        .q-text { font-weight: 500; margin-bottom: 10px; font-size: 1.05rem; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
+
+        .option-lbl {
+            display: flex; align-items: center; padding: 12px; background: white;
+            border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        }
+        .option-lbl:hover { border-color: var(--primary-light); background: var(--c-mc); }
+        .option-lbl input[type="radio"] { margin-right: 10px; transform: scale(1.2); cursor: pointer; }
+
+        .fill-text { font-size: 1.1rem; line-height: 1.8; }
+        .fill-select {
+            padding: 4px 10px; font-size: 1rem; border: 2px solid var(--b-fill); border-radius: 6px;
+            background: white; color: var(--primary); font-weight: bold; outline: none; cursor: pointer; margin: 0 5px;
+        }
+
+        .tf-table { width: 100%; border-collapse: collapse; }
+        .tf-table th, .tf-table td { padding: 12px; border-bottom: 1px solid var(--border); text-align: center; }
+        .tf-table th:first-child, .tf-table td:first-child { text-align: left; }
+        .tf-radio { transform: scale(1.3); cursor: pointer; }
+
+        .match-container { display: flex; justify-content: space-between; gap: 20px; }
+        .match-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .match-item {
+            padding: 15px; background: white; border: 2px solid var(--border); border-radius: 8px;
+            cursor: pointer; text-align: left; font-weight: 500; transition: all 0.2s; user-select: none;
+            display: flex; align-items: center;
+        }
+        .match-item.selected {
+            border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); transform: scale(1.02);
+        }
+        .color-tag {
+            display: inline-block; width: 20px; height: 20px; border-radius: 50%;
+            margin-right: 15px; flex-shrink: 0; background-color: #f1f5f9; border: 1px solid var(--border);
+            transition: background-color 0.3s;
+        }
+
+        .drag-tray {
+            display: flex; gap: 15px; padding: 15px; background: #f1f5f9; border-radius: 10px;
+            margin-bottom: 20px; min-height: 120px; align-items: center; justify-content: center; flex-wrap: wrap;
+        }
+        .drag-item {
+            width: 140px; height: 100px; background-color: white; border: 2px solid var(--primary-light);
+            border-radius: 8px; cursor: pointer; background-size: cover; background-position: center;
+            user-select: none; transition: transform 0.2s; display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; text-align: center; padding: 5px; font-weight: bold; color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .drag-item:active, .drag-item.selected-img {
+            transform: scale(1.1); border-color: var(--accent); box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); z-index: 10;
+        }
+        .drop-zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        @media (max-width: 768px) { .drop-zones { grid-template-columns: 1fr; } }
+        .drop-zone-wrapper { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 15px; text-align: center; }
+        .drop-zone {
+            width: 100%; height: 110px; border: 2px dashed var(--text-muted); border-radius: 8px;
+            margin-top: 10px; display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); background: #fafafa; transition: all 0.3s;
+        }
+        .drop-zone.drag-over { background: var(--c-drag); border-color: var(--primary); }
+
+        .video-wrapper {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+            border-radius: 10px; margin-bottom: 20px; background: #000;
+        }
+        .video-wrapper iframe, .video-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;}
+        .vid-input {
+            border: none; border-bottom: 2px solid var(--primary); background: transparent;
+            font-size: 1rem; font-weight: bold; color: var(--primary); text-align: center;
+            width: 150px; outline: none; padding: 2px 5px;
+        }
+
+        .btn-submit {
+            display: block; width: 100%; padding: 18px; background: linear-gradient(to right, var(--success), #16a34a);
+            color: white; border: none; border-radius: 15px; font-size: 1.5rem; font-weight: 900;
+            text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            transition: transform 0.2s; margin-top: 30px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6); }
+
+        .summary-card { background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #fcd34d; margin-top: 40px; }
+        .summary-card ul { padding-left: 20px; margin-top: 15px; } .summary-card li { margin-bottom: 10px; font-weight: 500; }
+
+        .feedback-icon { display: none; font-weight: bold; margin-left: 10px; font-size: 1.2rem; }
+        .correct-item { border-color: var(--success) !important; background-color: #f0fdf4 !important; }
+        .correct-item .feedback-icon.check { display: inline; color: var(--success); }
+        .incorrect-item { border-color: var(--danger) !important; background-color: #fef2f2 !important; }
+        .incorrect-item .feedback-icon.cross { display: inline; color: var(--danger); }
+        .correct-text { color: var(--success); font-weight: bold; }
+        .incorrect-text { color: var(--danger); font-weight: bold; text-decoration: line-through; }
+        .real-answer { display: none; color: var(--success); font-size: 0.9rem; margin-top: 5px; font-style: italic; }
+        .incorrect-item .real-answer { display: block; }
+
+        /* Modals (Score & Login) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+        .modal-box {
+            background: white; padding: 30px; border-radius: 20px; text-align: center;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-width: 90%; width: 400px;
+        }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        .score-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: conic-gradient(var(--success) 0%, var(--border) 0%);
+            margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 900; color: var(--primary); position: relative;
+        }
+        .score-circle::after { content: ""; position: absolute; width: 120px; height: 120px; background: white; border-radius: 50%; }
+        .score-text { position: relative; z-index: 2; }
+        
+        .custom-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; margin: 15px 0; font-size: 1.1rem; outline: none;}
+        .custom-input:focus { border-color: var(--primary); }
+        .btn-modal { padding: 10px 30px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size:1.1rem; }
+        .btn-modal-cancel { background: #e2e8f0; color: var(--text-main); margin-right: 10px; }
+
+        .admin-btn {
+            position: fixed; bottom: 20px; right: 20px; background: white; padding: 10px 15px;
+            border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer;
+            z-index: 99; font-weight: bold; color: var(--text-muted); border: 2px solid var(--border);
+        }
+        #admin-panel {
+            position: fixed; top: 0; right: -450px; width: 400px; max-width: 100%; height: 100%;
+            background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.15); z-index: 999;
+            transition: right 0.3s ease; overflow-y: auto; padding: 20px;
+        }
+        #admin-panel.open { right: 0; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .admin-group { margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border);}
+        .admin-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: var(--primary);}
+        .admin-group input[type="number"], .admin-group input[type="text"] {
+            width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 10px; outline:none;
+        }
+        .admin-group input[type="file"] { margin-bottom: 10px; font-size: 0.85rem;}
+        .admin-section-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;}
+        .btn-save-admin { width: 100%; padding: 15px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+        .close-admin { cursor: pointer; font-size: 2rem; color: var(--danger); line-height: 1; }
+        
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #333; color: white; padding: 12px 24px; border-radius: 30px;
+            font-weight: bold; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+
+        .hidden { display: none !important; }
+        .url-hint { font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-top: -8px; margin-bottom: 10px; display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="toast-msg" class="toast">Thông báo</div>
+
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="color: var(--primary); margin-bottom: 10px;">XÁC THỰC QUẢN TRỊ</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Vui lòng nhập mật khẩu giáo viên (1230)</p>
+            <input type="password" id="admin-pwd" class="custom-input" placeholder="Nhập mật khẩu..." onkeypress="if(event.key === 'Enter') checkPassword()">
+            <div style="margin-top: 10px;">
+                <button class="btn-modal btn-modal-cancel" onclick="closeLogin()">Hủy</button>
+                <button class="btn-modal" onclick="checkPassword()">Xác nhận</button>
+            </div>
+            <p id="login-err" style="color: var(--danger); font-size: 0.85rem; margin-top: 10px; display: none;">Mật khẩu không chính xác!</p>
+        </div>
+    </div>
+
+    <div class="admin-btn" onclick="openLogin()">⚙️ Quản trị</div>
+    
+    <div id="admin-panel">
+        <div class="admin-header">
+            <h3 style="color:var(--primary)">Cấu hình Phiếu Học Tập</h3>
+            <span class="close-admin" onclick="closeAdmin()">&times;</span>
+        </div>
+        
+        <div class="admin-group">
+            <label>Tổng điểm toàn phiếu:</label>
+            <input type="number" id="cfg-total-score" value="10" step="0.5">
+        </div>
+        
+        <div class="admin-group">
+            <div class="admin-section-toggle">
+                <strong>1. Trắc nghiệm</strong> 
+                <label style="margin:0"><input type="checkbox" id="cfg-mc-en" checked> Bật</label>
+            </div>
+            <label>Điểm tối đa:</label>
+            <input type="number" id="cfg-mc-pts" value="2" step="0.25">
+        </div>
+
+        <div class="admin-group">
+            <div class="admin-section-toggle">
+                <strong>2. Điền khuyết</strong> 
+                <label style="margin:0"><input type="checkbox" id="cfg-fill-en" checked> Bật</label>
+            </div>
+            <label>Điểm tối đa:</label>
+            <input type="number" id="cfg-fill-pts" value="2" step="0.25">
+        </div>
+
+        <div class="admin-group">
+            <div class="admin-section-toggle">
+                <strong>3. Đúng / Sai</strong> 
+                <label style="margin:0"><input type="checkbox" id="cfg-tf-en" checked> Bật</label>
+            </div>
+            <label>Điểm tối đa:</label>
+            <input type="number" id="cfg-tf-pts" value="1.5" step="0.25">
+        </div>
+
+        <div class="admin-group">
+            <div class="admin-section-toggle">
+                <strong>4. Nối cột</strong> 
+                <label style="margin:0"><input type="checkbox" id="cfg-match-en" checked> Bật</label>
+            </div>
+            <label>Điểm tối đa:</label>
+            <input type="number" id="cfg-match-pts" value="1.5" step="0.25">
+        </div>
+
+        <div class="admin-group">
+            <div class="admin-section-toggle">
+                <strong>5. Kéo thả hình ảnh</strong> 
+                <label style="margin:0"><input type="checkbox" id="cfg-drag-en" checked> Bật</label>
+            </div>
+            <label>Điểm tối đa:</label>
+            <input type="number" id="cfg-drag-pts" value="1.5" step="0.25">
+            
+            <!-- Cập nhật: Cho phép nhập URL hoặc Tải ảnh -->
+            <label style="margin-top:10px;">Ảnh 1 (Làm lạnh y tế):</label>
+            <input type="text" id="cfg-img1-url" placeholder="Dán link ảnh (URL)..." onchange="previewExternalImage('img1', this.value)">
+            <input type="file" accept="image/*" onchange="uploadLocalImage(this, 'img1')">
+            
+            <label style="border-top: 1px dashed #ccc; padding-top:10px;">Ảnh 2 (Phân bón):</label>
+            <input type="text" id="cfg-img2-url" placeholder="Dán link ảnh (URL)..." onchange="previewExternalImage('img2', this.value)">
+            <input type="file" accept="image/*" onchange="uploadLocalImage(this, 'img2')">
+            
+            <label style="border-top: 1px dashed #ccc; padding-top:10px;">Ảnh 3 (Bảo quản thực phẩm):</label>
+            <input type="text" id="cfg-img3-url" placeholder="Dán link ảnh (URL)..." onchange="previewExternalImage('img3', this.value)">
+            <input type="file" accept="image/*" onchange="uploadLocalImage(this, 'img3')">
+        </div>
+
+        <div class="admin-group">
+            <div class="admin-section-toggle">
+                <strong>6. Video & Điền khuyết</strong> 
+                <label style="margin:0"><input type="checkbox" id="cfg-vid-en" checked> Bật</label>
+            </div>
+            <label>Điểm tối đa:</label>
+            <input type="number" id="cfg-vid-pts" value="1.5" step="0.25">
+            
+            <!-- Cập nhật: Nguồn video đa dạng -->
+            <label style="margin-top:10px;">Nguồn Video (URL Youtube / MP4):</label>
+            <input type="text" id="cfg-vid-url" value="https://www.youtube.com/embed/Ejk_YwD391g" placeholder="Dán link YouTube hoặc .mp4">
+            <span class="url-hint">Lưu ý: Link YouTube nên dùng định dạng embed (vd: youtube.com/embed/...)</span>
+            
+            <label style="border-top: 1px dashed #ccc; padding-top:10px;">Hoặc Tải Video từ máy (Tối đa ~20MB):</label>
+            <input type="file" accept="video/mp4,video/webm" id="cfg-vid-file" onchange="uploadLocalVideo(this)">
+        </div>
+
+        <div class="admin-group" style="border: 2px solid var(--success); background: #f0fdf4;">
+            <label style="color: var(--success); font-size: 1rem;">🔗 KẾT NỐI GOOGLE SHEETS</label>
+            <span class="url-hint">Dán URL Web App của Google Apps Script vào đây để tự động lưu điểm:</span>
+            <input type="text" id="cfg-script-url" placeholder="https://script.google.com/macros/s/..." style="border-color: #86efac;">
+        </div>
+
+        <button class="btn-save-admin" onclick="saveAdmin()">💾 LƯU CẤU HÌNH</button>
+        <p id="admin-error" style="color:var(--danger); margin-top:10px; font-weight:bold; text-align:center; display:none;"></p>
+    </div>
+
+    <header>
+        <h1>Phiếu Học Tập Tương Tác</h1>
+        <h2>NITROGEN</h2>
+        <div class="student-info">
+            <input type="text" id="student-name" placeholder="Họ và tên của em..." required>
+            <input type="text" id="student-class" placeholder="Lớp..." style="width: 150px;" required>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Mục tiêu -->
+        <div class="card" style="border-top-color: var(--accent);">
+            <div class="card-title" style="color: var(--accent); margin-bottom: 10px;">🎯 MỤC TIÊU & HƯỚNG DẪN</div>
+            <ul style="padding-left: 20px; color: var(--text-muted);">
+                <li>Phát biểu được trạng thái tự nhiên của nguyên tố nitrogen.</li>
+                <li>Giải thích tính trơ ở nhiệt độ thường và tính hoạt động ở nhiệt độ cao.</li>
+                <li>Nêu được ứng dụng của đơn chất nitrogen khí và lỏng.</li>
+                <li><strong>Hướng dẫn:</strong> Em hãy thao tác trực tiếp trên phiếu (click chọn, điền từ, kéo thả). Sau khi làm xong, nhấn <b>NỘP BÀI</b> ở cuối trang.</li>
+            </ul>
+        </div>
+
+        <!-- Section 1 & 2 & 3: Giữ nguyên cấu trúc HTML, tối ưu CSS -->
+        <div class="card" id="sec-mc">
+            <div class="card-header">
+                <div class="card-title">KHU VỰC 1: TRẮC NGHIỆM NHANH</div>
+                <div class="card-points"><span id="pts-mc">2</span> Điểm</div>
+            </div>
+            <!-- Câu 1 -->
+            <div class="question-item" data-type="mc" data-answer="A">
+                <div class="q-text">Câu 1: Trong khí quyển Trái Đất, khí nitrogen chiếm khoảng bao nhiêu phần trăm thể tích? <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></div>
+                <div class="options-grid">
+                    <label class="option-lbl"><input type="radio" name="q1" value="A"> A. 78,1%</label>
+                    <label class="option-lbl"><input type="radio" name="q1" value="B"> B. 21%</label>
+                    <label class="option-lbl"><input type="radio" name="q1" value="C"> C. 75,5%</label>
+                    <label class="option-lbl"><input type="radio" name="q1" value="D"> D. 0,03%</label>
+                </div>
+                <div class="real-answer">Đáp án đúng: A. 78,1%</div>
+            </div>
+            <!-- Câu 2 -->
+            <div class="question-item" data-type="mc" data-answer="C">
+                <div class="q-text">Câu 2: Phân tử nitrogen (N<sub>2</sub>) gồm hai nguyên tử liên kết với nhau bằng liên kết gì? <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></div>
+                <div class="options-grid">
+                    <label class="option-lbl"><input type="radio" name="q2" value="A"> A. Liên kết đơn</label>
+                    <label class="option-lbl"><input type="radio" name="q2" value="B"> B. Liên kết đôi</label>
+                    <label class="option-lbl"><input type="radio" name="q2" value="C"> C. Liên kết ba</label>
+                    <label class="option-lbl"><input type="radio" name="q2" value="D"> D. Liên kết ion</label>
+                </div>
+                <div class="real-answer">Đáp án đúng: C. Liên kết ba</div>
+            </div>
+            <!-- Câu 3 -->
+            <div class="question-item" data-type="mc" data-answer="A">
+                <div class="q-text">Câu 3: Ở nhiệt độ thường, nitrogen khá trơ về mặt hoá học là do nguyên nhân chính nào? <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></div>
+                <div class="options-grid">
+                    <label class="option-lbl"><input type="radio" name="q3" value="A"> A. Năng lượng liên kết lớn (945 kJ/mol)</label>
+                    <label class="option-lbl"><input type="radio" name="q3" value="B"> B. Phân tử có tính phân cực mạnh</label>
+                    <label class="option-lbl"><input type="radio" name="q3" value="C"> C. Nitrogen là chất khí không màu</label>
+                    <label class="option-lbl"><input type="radio" name="q3" value="D"> D. Nitrogen có độ âm điện lớn</label>
+                </div>
+                <div class="real-answer">Đáp án đúng: A. Năng lượng liên kết lớn</div>
+            </div>
+            <!-- Câu 4 -->
+            <div class="question-item" data-type="mc" data-answer="B">
+                <div class="q-text">Câu 4: Trong phản ứng N<sub>2</sub> + O<sub>2</sub> ⇌ 2NO (ở nhiệt độ >3000°C), đơn chất nitrogen đóng vai trò là? <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></div>
+                <div class="options-grid">
+                    <label class="option-lbl"><input type="radio" name="q4" value="A"> A. Chất oxi hoá</label>
+                    <label class="option-lbl"><input type="radio" name="q4" value="B"> B. Chất khử</label>
+                    <label class="option-lbl"><input type="radio" name="q4" value="C"> C. Chất xúc tác</label>
+                    <label class="option-lbl"><input type="radio" name="q4" value="D"> D. Acid</label>
+                </div>
+                <div class="real-answer">Đáp án đúng: B. Chất khử (số oxi hoá tăng từ 0 lên +2)</div>
+            </div>
+        </div>
+
+        <div class="card" id="sec-fill">
+            <div class="card-header">
+                <div class="card-title">KHU VỰC 2: ĐIỀN KHUYẾT</div>
+                <div class="card-points"><span id="pts-fill">2</span> Điểm</div>
+            </div>
+            <div class="question-item" style="background: transparent;">
+                <p class="fill-text">
+                    Trong vỏ Trái Đất, nguyên tố nitrogen tồn tại tập trung ở một số mỏ khoáng dưới dạng 
+                    <select class="fill-select" data-answer="sodium nitrate">
+                        <option value="">-- Chọn --</option>
+                        <option value="sodium nitrate">sodium nitrate</option>
+                        <option value="calcium carbonate">calcium carbonate</option>
+                        <option value="sodium chloride">sodium chloride</option>
+                    </select> <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span> (còn thường gọi là diêm tiêu Chile).
+                    <br><br>
+                    Phân tử N<sub>2</sub> gồm hai nguyên tử liên kết với nhau bằng một liên kết 
+                    <select class="fill-select" data-answer="ba">
+                        <option value="">-- Chọn --</option><option value="đơn">đơn</option><option value="đôi">đôi</option><option value="ba">ba</option>
+                    </select> <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span> rất bền vững. Do đó, ở nhiệt độ thường, đơn chất N<sub>2</sub> rất 
+                    <select class="fill-select" data-answer="khó">
+                        <option value="">-- Chọn --</option><option value="dễ">dễ</option><option value="khó">khó</option>
+                    </select> <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span> tham gia phản ứng hoá học.
+                    <br><br>
+                    Quá trình tổng hợp ammonia trong công nghiệp được phát minh bởi các nhà khoa học và mang tên là quá trình 
+                    <select class="fill-select" data-answer="Haber-Bosch">
+                        <option value="">-- Chọn --</option><option value="Contact">Contact</option><option value="Haber-Bosch">Haber-Bosch</option>
+                    </select> <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span>.
+                </p>
+                <div class="real-answer fill-ans" style="margin-top:15px;">Đáp án: sodium nitrate / ba / khó / Haber-Bosch</div>
+            </div>
+        </div>
+
+        <div class="card" id="sec-tf">
+            <div class="card-header">
+                <div class="card-title">KHU VỰC 3: ĐÚNG / SAI</div>
+                <div class="card-points"><span id="pts-tf">1.5</span> Điểm</div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="tf-table">
+                    <thead><tr><th>Phát biểu</th><th width="80">Đúng</th><th width="80">Sai</th></tr></thead>
+                    <tbody>
+                        <tr class="tf-row" data-answer="T">
+                            <td>1. Nitrogen lỏng được dùng để làm lạnh nhanh, bảo quản mẫu vật y học. <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></td>
+                            <td><input type="radio" name="tf1" value="T" class="tf-radio"></td><td><input type="radio" name="tf1" value="F" class="tf-radio"></td>
+                        </tr>
+                        <tr class="tf-row" data-answer="F">
+                            <td>2. Khí nitrogen duy trì sự cháy và sự hô hấp của con người. <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></td>
+                            <td><input type="radio" name="tf2" value="T" class="tf-radio"></td><td><input type="radio" name="tf2" value="F" class="tf-radio"></td>
+                        </tr>
+                        <tr class="tf-row" data-answer="F">
+                            <td>3. Phản ứng giữa khí N<sub>2</sub> và O<sub>2</sub> xảy ra dễ dàng ở nhiệt độ phòng. <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></td>
+                            <td><input type="radio" name="tf3" value="T" class="tf-radio"></td><td><input type="radio" name="tf3" value="F" class="tf-radio"></td>
+                        </tr>
+                        <tr class="tf-row" data-answer="T">
+                            <td>4. Nguyên tố nitrogen là thành phần cấu tạo nên protein ở động vật, thực vật. <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span></td>
+                            <td><input type="radio" name="tf4" value="T" class="tf-radio"></td><td><input type="radio" name="tf4" value="F" class="tf-radio"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="real-answer tf-ans" style="margin-top:10px;">Đáp án: 1-Đúng, 2-Sai (không duy trì), 3-Sai (cần ~3000°C), 4-Đúng.</div>
+            </div>
+        </div>
+
+        <div class="card" id="sec-match">
+            <div class="card-header">
+                <div class="card-title">KHU VỰC 4: NỐI CỘT</div>
+                <div class="card-points"><span id="pts-match">1.5</span> Điểm</div>
+            </div>
+            <p style="margin-bottom: 15px; color: var(--text-muted);">
+                <i>Hướng dẫn: Nhấn chọn 1 ô ở Cột A rồi chọn ô ở Cột B, <b>hoặc ngược lại</b> (chọn B rồi chọn A) để ghép nối.</i>
+            </p>
+            <div class="match-container">
+                <div class="match-col" id="col-a">
+                    <div class="match-item" id="a1" data-match="b4" onclick="handleMatchClick(this, 'A')"><span class="color-tag"></span>1. Nitrogen lỏng</div>
+                    <div class="match-item" id="a2" data-match="b2" onclick="handleMatchClick(this, 'A')"><span class="color-tag"></span>2. Quá trình Haber-Bosch</div>
+                    <div class="match-item" id="a3" data-match="b1" onclick="handleMatchClick(this, 'A')"><span class="color-tag"></span>3. Mưa dông kèm sấm sét</div>
+                    <div class="match-item" id="a4" data-match="b3" onclick="handleMatchClick(this, 'A')"><span class="color-tag"></span>4. Diêm tiêu Chile</div>
+                </div>
+                <div class="match-col" id="col-b">
+                    <div class="match-item" id="b1" onclick="handleMatchClick(this, 'B')"><span class="color-tag"></span>A. Tạo ra đạm nitrate tự nhiên cho đất</div>
+                    <div class="match-item" id="b2" onclick="handleMatchClick(this, 'B')"><span class="color-tag"></span>B. Tổng hợp ammonia trong công nghiệp</div>
+                    <div class="match-item" id="b3" onclick="handleMatchClick(this, 'B')"><span class="color-tag"></span>C. Thành phần chính là sodium nitrate</div>
+                    <div class="match-item" id="b4" onclick="handleMatchClick(this, 'B')"><span class="color-tag"></span>D. Bảo quản thực phẩm, trị mụn cóc y học</div>
+                </div>
+            </div>
+            <div class="real-answer match-ans" style="margin-top:15px; text-align: center;">Đáp án: 1-D, 2-B, 3-A, 4-C</div>
+        </div>
+
+        <div class="card" id="sec-drag">
+            <div class="card-header">
+                <div class="card-title">KHU VỰC 5: XẾP ẢNH ỨNG DỤNG</div>
+                <div class="card-points"><span id="pts-drag">1.5</span> Điểm</div>
+            </div>
+            <p style="margin-bottom: 15px; color: var(--text-muted);"><i>Hướng dẫn: Kéo ảnh hoặc bấm vào ảnh rồi bấm vào ô trống để xếp đúng ứng dụng của Nitrogen.</i></p>
+            
+            <div class="drag-tray" id="drag-tray">
+                <div class="drag-item" id="img1" data-id="med" draggable="true" style="background-color:#dbeafe;" onclick="handleImgClick(this)" ondragstart="dragStart(event)">LÀM LẠNH<br>(Máu, y tế)</div>
+                <div class="drag-item" id="img2" data-id="fert" draggable="true" style="background-color:#dcfce7;" onclick="handleImgClick(this)" ondragstart="dragStart(event)">TỔNG HỢP NH3<br>(Phân bón)</div>
+                <div class="drag-item" id="img3" data-id="food" draggable="true" style="background-color:#fef3c7;" onclick="handleImgClick(this)" ondragstart="dragStart(event)">TẠO KHÍ QUYỂN TRƠ<br>(Bảo quản thực phẩm)</div>
+            </div>
+
+            <div class="drop-zones">
+                <div class="drop-zone-wrapper">
+                    <strong>Sản xuất đạm (Nitrate, Urea)</strong>
+                    <div class="drop-zone" data-target="fert" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event)" onclick="handleZoneClick(this)">Thả ảnh vào đây</div>
+                    <div class="feedback-icon check" style="display:none; color:var(--success); margin-top:5px;">✓ Chính xác</div>
+                    <div class="feedback-icon cross" style="display:none; color:var(--danger); margin-top:5px;">✗ Sai (Đáp án: Tổng hợp NH3)</div>
+                </div>
+                <div class="drop-zone-wrapper">
+                    <strong>Làm căng vỏ bao bì snack</strong>
+                    <div class="drop-zone" data-target="food" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event)" onclick="handleZoneClick(this)">Thả ảnh vào đây</div>
+                    <div class="feedback-icon check" style="display:none; color:var(--success); margin-top:5px;">✓ Chính xác</div>
+                    <div class="feedback-icon cross" style="display:none; color:var(--danger); margin-top:5px;">✗ Sai (Đáp án: Tạo khí quyển trơ)</div>
+                </div>
+                <div class="drop-zone-wrapper">
+                    <strong>Bảo quản tế bào gốc</strong>
+                    <div class="drop-zone" data-target="med" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event)" onclick="handleZoneClick(this)">Thả ảnh vào đây</div>
+                    <div class="feedback-icon check" style="display:none; color:var(--success); margin-top:5px;">✓ Chính xác</div>
+                    <div class="feedback-icon cross" style="display:none; color:var(--danger); margin-top:5px;">✗ Sai (Đáp án: Làm lạnh)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="sec-vid">
+            <div class="card-header">
+                <div class="card-title">KHU VỰC 6: KHÁM PHÁ VIDEO</div>
+                <div class="card-points"><span id="pts-vid">1.5</span> Điểm</div>
+            </div>
+            
+            <div class="video-wrapper" id="video-container">
+                <!-- Mặc định dùng iframe cho youtube -->
+                <iframe id="lesson-video-frame" src="https://www.youtube.com/embed/Ejk_YwD391g" title="Video bài học" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <video id="lesson-video-local" controls style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#000;"></video>
+            </div>
+
+            <div class="question-item" style="background: transparent;">
+                <p class="fill-text">
+                    <i>Sau khi xem video (hoặc dựa vào kiến thức đã học), điền từ thích hợp:</i><br><br>
+                    Để phản ứng tổng hợp ammonia đạt hiệu suất cao trong công nghiệp (quá trình Haber-Bosch), cần thực hiện ở nhiệt độ 400-500°C, áp suất cao và đặc biệt phải có mặt của chất <input type="text" class="vid-input" data-answer="xúc tác"> <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span> (thường là bột sắt). 
+                    <br><br>
+                    Phản ứng này toả nhiệt nên khi tăng nhiệt độ quá cao, cân bằng chuyển dịch theo chiều làm <input type="text" class="vid-input" data-answer="giảm"> <span class="feedback-icon check">✓</span><span class="feedback-icon cross">✗</span> hiệu suất tạo ra NH<sub>3</sub>.
+                </p>
+                <div class="real-answer vid-ans" style="margin-top:15px;">Đáp án: xúc tác / giảm</div>
+            </div>
+        </div>
+
+        <!-- Nút Nộp Bài -->
+        <button class="btn-submit" onclick="submitExam()">NỘP BÀI & CHẤM ĐIỂM</button>
+
+        <div class="card summary-card">
+            <div class="card-title" style="color: #d97706; text-align: center;">🧠 GHI NHỚ SIÊU NHANH</div>
+            <ul>
+                <li><strong>Trạng thái:</strong> Dồi dào nhất trong không khí (~78%). Có trong protein, nucleic acid.</li>
+                <li><strong>Cấu tạo:</strong> Phân tử N<sub>2</sub> có liên kết ba cực kỳ bền vững ($945\ kJ/mol$).</li>
+                <li><strong>Tính chất:</strong> Trơ ở nhiệt độ thường. Hoạt động ở nhiệt độ cao (có tính oxi hoá và khử).</li>
+                <li><strong>Ứng dụng:</strong> Làm lạnh nhanh (N lỏng), bảo quản thực phẩm, tổng hợp ammonia.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="score-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 20px; color: var(--text-main);">KẾT QUẢ CỦA EM</h2>
+            <div class="score-circle" id="final-circle">
+                <span class="score-text" id="final-score-text">0.0</span>
+            </div>
+            <p style="font-size: 1.2rem; color: var(--text-muted);">Tổng điểm: <strong id="max-score-text">10</strong></p>
+            <p id="score-msg" style="margin-top:10px; font-weight:bold; color:var(--primary); font-size:1.1rem;"></p>
+            <button class="btn-submit" style="margin-top: 20px; padding: 12px; font-size: 1.1rem; text-transform:none;" onclick="closeScore()">Xem Chi Tiết Bài Làm</button>
+        </div>
+    </div>
+
+    <script>
+        // Hàm hiển thị Toast (Thay thế alert)
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.style.background = isError ? "var(--danger)" : "var(--success)";
+            toast.style.opacity = "1";
+            setTimeout(() => { toast.style.opacity = "0"; }, 3000);
+        }
+
+        // Khởi tạo Config
+        let config = {
+            total: 10,
+            mc: { active: true, pts: 2 }, fill: { active: true, pts: 2 },
+            tf: { active: true, pts: 1.5 }, match: { active: true, pts: 1.5 },
+            drag: { active: true, pts: 1.5 }, vid: { active: true, pts: 1.5 },
+            imgUrls: { img1: '', img2: '', img3: '' },
+            vidUrl: "https://www.youtube.com/embed/Ejk_YwD391g",
+            vidType: 'url', // 'url' hoặc 'file'
+            scriptUrl: "https://script.google.com/macros/s/AKfycbx2pPgXpO10cMDHgnmmqEJ056Uf0sntW2DMQJDHYxlGoNZx4wS6brutLIk1qHUWZ7bG/exec" // Đã thêm link Google Apps Script mặc định
+        };
+        
+        let hasSubmitted = false;
+
+        // Tải config từ LocalStorage
+        function loadConfig() {
+            const saved = localStorage.getItem('nitrogenConfig2'); // dùng key mới để tránh lỗi cũ
+            if (saved) {
+                try {
+                    config = JSON.parse(saved);
+                } catch(e) {}
+            }
+            applyConfig();
+        }
+
+        function applyConfig() {
+            // Hiển thị section
+            document.getElementById('sec-mc').style.display = config.mc.active ? 'block' : 'none';
+            document.getElementById('sec-fill').style.display = config.fill.active ? 'block' : 'none';
+            document.getElementById('sec-tf').style.display = config.tf.active ? 'block' : 'none';
+            document.getElementById('sec-match').style.display = config.match.active ? 'block' : 'none';
+            document.getElementById('sec-drag').style.display = config.drag.active ? 'block' : 'none';
+            document.getElementById('sec-vid').style.display = config.vid.active ? 'block' : 'none';
+
+            // Áp dụng ảnh nếu có
+            for(let key in config.imgUrls) {
+                if(config.imgUrls[key]) {
+                    let el = document.getElementById(key);
+                    if(el) {
+                        el.style.backgroundImage = `url('${config.imgUrls[key]}')`;
+                        el.innerHTML = ""; // Xoá chữ đi
+                    }
+                    // Cập nhật lại giao diện admin cho đồng bộ
+                    if(document.getElementById(`cfg-${key}-url`)) {
+                        // Nếu là url dài quá (như base64) thì không điền vào ô input tránh lag
+                        if(config.imgUrls[key].length < 500) {
+                            document.getElementById(`cfg-${key}-url`).value = config.imgUrls[key];
+                        } else {
+                            document.getElementById(`cfg-${key}-url`).value = "Đã tải ảnh từ máy tính (ẩn link)";
+                        }
+                    }
+                }
+            }
+
+            // Áp dụng Video
+            const frame = document.getElementById('lesson-video-frame');
+            const localVid = document.getElementById('lesson-video-local');
+            
+            if (config.vidType === 'url' && config.vidUrl) {
+                localVid.style.display = 'none'; localVid.pause();
+                frame.style.display = 'block';
+                // Kiểm tra xem là link youtube hay mp4
+                if(config.vidUrl.includes('.mp4')) {
+                    frame.style.display = 'none';
+                    localVid.style.display = 'block';
+                    localVid.src = config.vidUrl;
+                } else {
+                    frame.src = config.vidUrl;
+                }
+                document.getElementById('cfg-vid-url').value = config.vidUrl;
+            } else if (config.vidType === 'file' && config.vidUrl) {
+                frame.style.display = 'none';
+                localVid.style.display = 'block';
+                localVid.src = config.vidUrl;
+            }
+
+            // Sync điểm số
+            document.getElementById('cfg-total-score').value = config.total;
+            document.getElementById('cfg-mc-en').checked = config.mc.active; document.getElementById('cfg-mc-pts').value = config.mc.pts;
+            document.getElementById('cfg-fill-en').checked = config.fill.active; document.getElementById('cfg-fill-pts').value = config.fill.pts;
+            document.getElementById('cfg-tf-en').checked = config.tf.active; document.getElementById('cfg-tf-pts').value = config.tf.pts;
+            document.getElementById('cfg-match-en').checked = config.match.active; document.getElementById('cfg-match-pts').value = config.match.pts;
+            document.getElementById('cfg-drag-en').checked = config.drag.active; document.getElementById('cfg-drag-pts').value = config.drag.pts;
+            document.getElementById('cfg-vid-en').checked = config.vid.active; document.getElementById('cfg-vid-pts').value = config.vid.pts;
+            document.getElementById('cfg-script-url').value = config.scriptUrl || "";
+
+            // Update UI số điểm
+            document.getElementById('pts-mc').innerText = config.mc.pts;
+            document.getElementById('pts-fill').innerText = config.fill.pts;
+            document.getElementById('pts-tf').innerText = config.tf.pts;
+            document.getElementById('pts-match').innerText = config.match.pts;
+            document.getElementById('pts-drag').innerText = config.drag.pts;
+            document.getElementById('pts-vid').innerText = config.vid.pts;
+        }
+
+        /* --- QUẢN TRỊ ADMIN --- */
+        function openLogin() {
+            document.getElementById('admin-pwd').value = '';
+            document.getElementById('login-err').style.display = 'none';
+            document.getElementById('login-modal').style.display = 'flex';
+            document.getElementById('admin-pwd').focus();
+        }
+        function closeLogin() { document.getElementById('login-modal').style.display = 'none'; }
+
+        function checkPassword() {
+            if (document.getElementById('admin-pwd').value === '1230') {
+                closeLogin();
+                document.getElementById('admin-panel').classList.add('open');
+                applyConfig();
+            } else {
+                document.getElementById('login-err').style.display = 'block';
+            }
+        }
+
+        function closeAdmin() { 
+            document.getElementById('admin-panel').classList.remove('open'); 
+            document.getElementById('admin-error').style.display = 'none';
+        }
+
+        // Xử lý Ảnh & Video Admin
+        function previewExternalImage(targetId, url) {
+            if(!url) return;
+            config.imgUrls[targetId] = url;
+            let el = document.getElementById(targetId);
+            if(el) {
+                el.style.backgroundImage = `url('${url}')`;
+                el.innerHTML = "";
+            }
+        }
+
+        function uploadLocalImage(input, targetId) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    config.imgUrls[targetId] = e.target.result; // lưu base64
+                    let el = document.getElementById(targetId);
+                    if(el) {
+                        el.style.backgroundImage = `url('${e.target.result}')`;
+                        el.innerHTML = ""; 
+                    }
+                    document.getElementById(`cfg-${targetId}-url`).value = "Đã tải ảnh từ máy tính (ẩn link)";
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function uploadLocalVideo(input) {
+            if (input.files && input.files[0]) {
+                // Video thường nặng, không nên lưu base64 vào localStorage. 
+                // Tạo ObjectURL để dùng ngay phiên này (nếu reload sẽ mất, giáo viên cần lưu ý).
+                let url = URL.createObjectURL(input.files[0]);
+                config.vidType = 'file';
+                config.vidUrl = url;
+                
+                document.getElementById('lesson-video-frame').style.display = 'none';
+                let localVid = document.getElementById('lesson-video-local');
+                localVid.style.display = 'block';
+                localVid.src = url;
+                
+                document.getElementById('cfg-vid-url').value = "Đã chọn Video từ máy";
+                showToast("Đã tải video lên thành công (Dùng cho máy hiện tại).");
+            }
+        }
+
+        function saveAdmin() {
+            let newTotal = parseFloat(document.getElementById('cfg-total-score').value);
+            
+            let mc = { active: document.getElementById('cfg-mc-en').checked, pts: parseFloat(document.getElementById('cfg-mc-pts').value) };
+            let fill = { active: document.getElementById('cfg-fill-en').checked, pts: parseFloat(document.getElementById('cfg-fill-pts').value) };
+            let tf = { active: document.getElementById('cfg-tf-en').checked, pts: parseFloat(document.getElementById('cfg-tf-pts').value) };
+            let match = { active: document.getElementById('cfg-match-en').checked, pts: parseFloat(document.getElementById('cfg-match-pts').value) };
+            let drag = { active: document.getElementById('cfg-drag-en').checked, pts: parseFloat(document.getElementById('cfg-drag-pts').value) };
+            let vid = { active: document.getElementById('cfg-vid-en').checked, pts: parseFloat(document.getElementById('cfg-vid-pts').value) };
+            
+            // Xử lý Video URL text input
+            let vUrlInput = document.getElementById('cfg-vid-url').value;
+            if (vUrlInput !== "Đã chọn Video từ máy" && vUrlInput.trim() !== "") {
+                config.vidType = 'url';
+                config.vidUrl = vUrlInput;
+            }
+
+            config.scriptUrl = document.getElementById('cfg-script-url').value.trim();
+
+            let sum = 0;
+            if(mc.active) sum += mc.pts; if(fill.active) sum += fill.pts;
+            if(tf.active) sum += tf.pts; if(match.active) sum += match.pts;
+            if(drag.active) sum += drag.pts; if(vid.active) sum += vid.pts;
+
+            sum = Math.round(sum * 100) / 100;
+            newTotal = Math.round(newTotal * 100) / 100;
+
+            if (sum !== newTotal) {
+                let err = document.getElementById('admin-error');
+                err.innerHTML = `⚠️ Lỗi: Tổng điểm phân bổ (${sum}) không khớp với Tổng phiếu (${newTotal}).`;
+                err.style.display = 'block';
+                return;
+            }
+
+            // Lưu vào object gốc (giữ nguyên config.imgUrls và config.vidUrl đã set ở trên)
+            config.total = newTotal; config.mc = mc; config.fill = fill; 
+            config.tf = tf; config.match = match; config.drag = drag; config.vid = vid;
+            
+            // Ép xóa Video Base64 quá nặng trước khi lưu LocalStorage (tránh lỗi QuotaExceeded)
+            let tempConfig = JSON.parse(JSON.stringify(config));
+            if(tempConfig.vidType === 'file' && tempConfig.vidUrl.startsWith('blob:')) {
+                tempConfig.vidUrl = ''; // Không lưu ObjectURL vào cache vì nó vô dụng sau khi reload
+            }
+            
+            try {
+                localStorage.setItem('nitrogenConfig2', JSON.stringify(tempConfig));
+                showToast("✅ Đã lưu cấu hình thành công!");
+                closeAdmin();
+                applyConfig();
+            } catch(e) {
+                alert("Lỗi lưu trữ: Ảnh/Video bạn chọn quá nặng. Hệ thống sẽ áp dụng tạm thời nhưng không lưu qua lần khởi động sau.");
+                closeAdmin();
+                applyConfig();
+            }
+        }
+
+        /* --- LOGIC CÂU HỎI TƯƠNG TÁC --- */
+
+        let activeMatchNode = null;
+        let activeMatchCol = null;
+        let matchResults = {}; 
+        const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b']; // Đỏ, Xanh dương, Xanh lá, Vàng
+
+        function handleMatchClick(el, col) {
+            if (hasSubmitted) return;
+            
+            // 1. Nhấn lại cùng một cột (Đổi lựa chọn)
+            if (activeMatchCol === col) {
+                document.querySelectorAll(`#col-${col.toLowerCase()} .match-item`).forEach(i => i.classList.remove('selected'));
+                el.classList.add('selected');
+                activeMatchNode = el;
+                return;
+            }
+
+            // 2. Nhấn sang cột kia (Thực hiện nối)
+            if (activeMatchNode && activeMatchCol !== col) {
+                let nodeA = (col === 'A') ? el : activeMatchNode;
+                let nodeB = (col === 'B') ? el : activeMatchNode;
+
+                let leftId = nodeA.id;
+                let rightId = nodeB.id;
+
+                // Xoá quan hệ nối cũ của A (nếu có)
+                for (let key in matchResults) {
+                    if (matchResults[key] === rightId) delete matchResults[key]; // Giải phóng B nếu B đang nối với A khác
+                }
+                matchResults[leftId] = rightId;
+
+                // Tô màu tag
+                let colorIdx = parseInt(leftId.replace('a', '')) - 1;
+                let color = colors[colorIdx % colors.length];
+
+                nodeA.querySelector('.color-tag').style.backgroundColor = color;
+                
+                // Xoá màu của các B không còn được nối với A này
+                document.querySelectorAll('#col-b .match-item').forEach(item => {
+                    if(!Object.values(matchResults).includes(item.id)) {
+                        item.querySelector('.color-tag').style.backgroundColor = 'transparent';
+                    }
+                });
+                nodeB.querySelector('.color-tag').style.backgroundColor = color;
+
+                // Bỏ viền chọn
+                activeMatchNode.classList.remove('selected');
+                activeMatchNode = null;
+                activeMatchCol = null;
+                return;
+            }
+
+            // 3. Nhấn lần đầu tiên
+            if (!activeMatchNode) {
+                el.classList.add('selected');
+                activeMatchNode = el;
+                activeMatchCol = col;
+            }
+        }
+
+        let selectedDragImg = null;
+
+        function dragStart(e) {
+            if (hasSubmitted) return;
+            e.dataTransfer.setData("text/plain", e.target.id);
+            selectedDragImg = e.target;
+        }
+        function dragOver(e) {
+            if (hasSubmitted) return; e.preventDefault(); e.currentTarget.classList.add('drag-over');
+        }
+        function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function drop(e) {
+            if (hasSubmitted) return;
+            e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+            let data = e.dataTransfer.getData("text");
+            let img = document.getElementById(data);
+            if(img && e.currentTarget.classList.contains('drop-zone')) {
+                if (e.currentTarget.children.length > 0) {
+                    document.getElementById('drag-tray').appendChild(e.currentTarget.children[0]); // Trả ảnh cũ về khay
+                }
+                e.currentTarget.innerHTML = "";
+                e.currentTarget.appendChild(img);
+                img.classList.remove('selected-img');
+            }
+            selectedDragImg = null;
+        }
+
+        function handleImgClick(el) {
+            if (hasSubmitted) return;
+            document.querySelectorAll('.drag-item').forEach(i => i.classList.remove('selected-img'));
+            if (selectedDragImg === el) { selectedDragImg = null; } 
+            else { el.classList.add('selected-img'); selectedDragImg = el; }
+        }
+        function handleZoneClick(el) {
+            if (hasSubmitted) return;
+            if (selectedDragImg) {
+                if (el.children.length > 0 && el.children[0].classList.contains('drag-item')) {
+                     document.getElementById('drag-tray').appendChild(el.children[0]);
+                }
+                el.innerHTML = ""; el.appendChild(selectedDragImg);
+                selectedDragImg.classList.remove('selected-img'); selectedDragImg = null;
+            } else if (el.children.length > 0 && el.children[0].classList.contains('drag-item')) {
+                document.getElementById('drag-tray').appendChild(el.children[0]);
+                el.innerHTML = "Thả ảnh vào đây";
+            }
+        }
+
+        async function submitExam() {
+            let name = document.getElementById('student-name').value.trim();
+            let cls = document.getElementById('student-class').value.trim();
+            
+            if (!name || !cls) {
+                showToast("⚠️ Vui lòng nhập Họ Tên và Lớp trước khi nộp bài!", true);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.getElementById('student-name').focus();
+                return;
+            }
+            
+            hasSubmitted = true;
+            let finalScore = 0;
+            let stats = { correct: 0, incorrect: 0, unanswered: 0, total: 0 };
+            
+            const submitBtn = document.querySelector('.btn-submit');
+            submitBtn.innerText = "ĐANG CHẤM ĐIỂM & LƯU...";
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+
+            // 1. Trắc nghiệm
+            if (config.mc.active) {
+                let items = document.querySelectorAll('#sec-mc .question-item');
+                let count = 0;
+                items.forEach(item => {
+                    stats.total++;
+                    let ans = item.getAttribute('data-answer');
+                    let checked = item.querySelector('input[type="radio"]:checked');
+                    if (checked) {
+                        if (checked.value === ans) { count++; stats.correct++; item.classList.add('correct-item'); } 
+                        else { stats.incorrect++; item.classList.add('incorrect-item'); checked.parentElement.style.color = 'var(--danger)'; }
+                    } else {
+                        stats.unanswered++; item.classList.add('incorrect-item');
+                    }
+                    item.querySelectorAll('input').forEach(i => i.disabled = true);
+                });
+                finalScore += (count / items.length) * config.mc.pts;
+            }
+
+            // 2. Điền khuyết
+            if (config.fill.active) {
+                let selects = document.querySelectorAll('#sec-fill .fill-select');
+                let count = 0;
+                selects.forEach(sel => {
+                    stats.total++;
+                    if (!sel.value) {
+                        stats.unanswered++; sel.classList.add('incorrect-text'); sel.nextElementSibling.nextElementSibling.style.display = 'inline';
+                    } else if (sel.value === sel.getAttribute('data-answer')) {
+                        count++; stats.correct++; sel.classList.add('correct-text'); sel.nextElementSibling.style.display = 'inline';
+                    } else {
+                        stats.incorrect++; sel.classList.add('incorrect-text'); sel.nextElementSibling.nextElementSibling.style.display = 'inline';
+                    }
+                    sel.disabled = true;
+                });
+                document.querySelector('.fill-ans').style.display = 'block';
+                finalScore += (count / selects.length) * config.fill.pts;
+            }
+
+            // 3. Đúng Sai
+            if (config.tf.active) {
+                let rows = document.querySelectorAll('#sec-tf .tf-row');
+                let count = 0;
+                rows.forEach(row => {
+                    stats.total++;
+                    let checked = row.querySelector('input[type="radio"]:checked');
+                    if (checked) {
+                        if (checked.value === row.getAttribute('data-answer')) {
+                            count++; stats.correct++; row.classList.add('correct-item'); row.querySelector('.check').style.display = 'inline';
+                        } else {
+                            stats.incorrect++; row.classList.add('incorrect-item'); row.querySelector('.cross').style.display = 'inline';
+                        }
+                    } else {
+                        stats.unanswered++; row.classList.add('incorrect-item'); row.querySelector('.cross').style.display = 'inline';
+                    }
+                    row.querySelectorAll('input').forEach(i => i.disabled = true);
+                });
+                document.querySelector('.tf-ans').style.display = 'block';
+                finalScore += (count / rows.length) * config.tf.pts;
+            }
+
+            // 4. Nối cột
+            if (config.match.active) {
+                let leftItems = document.querySelectorAll('#col-a .match-item');
+                let count = 0;
+                leftItems.forEach(item => {
+                    stats.total++;
+                    let uMatch = matchResults[item.id];
+                    if (uMatch) {
+                        if (uMatch === item.getAttribute('data-match')) {
+                            count++; stats.correct++; item.style.borderColor = 'var(--success)';
+                            document.getElementById(uMatch).style.borderColor = 'var(--success)';
+                        } else {
+                            stats.incorrect++; item.style.borderColor = 'var(--danger)';
+                            document.getElementById(uMatch).style.borderColor = 'var(--danger)';
+                        }
+                    } else {
+                        stats.unanswered++; item.style.borderColor = 'var(--danger)';
+                    }
+                });
+                document.querySelector('.match-ans').style.display = 'block';
+                finalScore += (count / leftItems.length) * config.match.pts;
+            }
+
+            // 5. Kéo thả
+            if (config.drag.active) {
+                let zones = document.querySelectorAll('#sec-drag .drop-zone');
+                let count = 0;
+                zones.forEach(zone => {
+                    stats.total++;
+                    let wrapper = zone.parentElement;
+                    if (zone.children.length > 0 && zone.children[0].classList.contains('drag-item')) {
+                        if (zone.children[0].getAttribute('data-id') === zone.getAttribute('data-target')) {
+                            count++; stats.correct++; zone.style.borderColor = 'var(--success)'; zone.style.background = '#f0fdf4';
+                            wrapper.querySelector('.check').style.display = 'block';
+                        } else {
+                            stats.incorrect++; zone.style.borderColor = 'var(--danger)'; zone.style.background = '#fef2f2';
+                            wrapper.querySelector('.cross').style.display = 'block';
+                        }
+                    } else {
+                         stats.unanswered++; zone.style.borderColor = 'var(--danger)';
+                         wrapper.querySelector('.cross').style.display = 'block';
+                         wrapper.querySelector('.cross').innerText = "✗ Chưa kéo ảnh";
+                    }
+                });
+                finalScore += (count / zones.length) * config.drag.pts;
+                document.querySelectorAll('.drag-item').forEach(i => i.draggable = false);
+            }
+
+            // 6. Video
+            if (config.vid.active) {
+                let inputs = document.querySelectorAll('#sec-vid .vid-input');
+                let count = 0;
+                inputs.forEach(inp => {
+                    stats.total++;
+                    let val = inp.value.trim().toLowerCase();
+                    if (!val) {
+                        stats.unanswered++; inp.classList.add('incorrect-text'); inp.nextElementSibling.nextElementSibling.style.display = 'inline';
+                    } else if (val === inp.getAttribute('data-answer').toLowerCase()) {
+                        count++; stats.correct++; inp.classList.add('correct-text'); inp.nextElementSibling.style.display = 'inline';
+                    } else {
+                        stats.incorrect++; inp.classList.add('incorrect-text'); inp.nextElementSibling.nextElementSibling.style.display = 'inline';
+                    }
+                    inp.disabled = true;
+                });
+                document.querySelector('.vid-ans').style.display = 'block';
+                finalScore += (count / inputs.length) * config.vid.pts;
+            }
+
+            finalScore = Math.round(finalScore * 100) / 100;
+            
+            // Gửi dữ liệu về Google Sheets
+            if (config.scriptUrl) {
+                const payload = {
+                    name: name,
+                    className: cls,
+                    score: finalScore,
+                    correct: stats.correct,
+                    incorrect: stats.incorrect,
+                    unanswered: stats.unanswered,
+                    total: stats.total
+                };
+
+                try {
+                    // Gửi theo định dạng text/plain để tránh lỗi CORS Preflight
+                    let response = await fetch(config.scriptUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify(payload)
+                    });
+                    showToast("✅ Đã lưu kết quả thành công!");
+                } catch (error) {
+                    console.error("Lỗi gửi dữ liệu:", error);
+                    showToast("⚠️ Nộp bài thành công nhưng lỗi lưu máy chủ. Báo với giáo viên nhé!", true);
+                }
+            } else {
+                // Nếu giáo viên chưa cấu hình URL
+                showToast("⚠️ Chỉ chấm điểm tại máy (Chưa cấu hình Google Sheets)");
+            }
+
+            // Hiển thị Modal Kết Quả
+            document.getElementById('final-score-text').innerText = finalScore;
+            document.getElementById('max-score-text').innerText = config.total;
+            
+            let percentage = (finalScore / config.total) * 100;
+            document.getElementById('final-circle').style.background = `conic-gradient(var(--success) ${percentage}%, var(--border) 0%)`;
+
+            let msg = document.getElementById('score-msg');
+            if (percentage >= 80) msg.innerText = "Tuyệt vời! Em nắm bài rất chắc!";
+            else if (percentage >= 50) msg.innerText = "Khá tốt! Hãy xem lại phần sai nhé.";
+            else msg.innerText = "Cần cố gắng hơn. Đọc lại Ghi nhớ siêu nhanh nhé!";
+
+            document.getElementById('score-modal').style.display = 'flex';
+            submitBtn.style.display = 'none';
+        }
+
+        function closeScore() { document.getElementById('score-modal').style.display = 'none'; }
+
+        window.onload = loadConfig;
+    </script>
+</body>
+</html>
